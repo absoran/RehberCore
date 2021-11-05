@@ -1,0 +1,57 @@
+﻿@*@model IEnumerable<RehberCore.Models.Contact>*@
+@model List<Contact>
+@{
+    ViewData["Title"] = "ShowAll2";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Rehber</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table" cellspacing="1">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model[0].FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Numbers)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @foreach(var number in item.Numbers)
+                {
+                        @Html.DisplayName(number.PhoneNumber)<br />                       
+                }
+                    @*@for (int i = 0; i < item.Numbers.Count; i++)
+                    {
+                        @Html.DisplayFor(item => item[i].Numbers[i])<br />
+                    }*@
+                    @*@Html.DisplayFor(modelItem => item.Numbers)<text>|<br />|</text>*@
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

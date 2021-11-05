@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberCore", "RehberCore\RehberCore.csproj", "{C44925E0-88AC-4A8A-BF4B-E66966858EDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C44925E0-88AC-4A8A-BF4B-E66966858EDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C44925E0-88AC-4A8A-BF4B-E66966858EDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C44925E0-88AC-4A8A-BF4B-E66966858EDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C44925E0-88AC-4A8A-BF4B-E66966858EDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE96F091-2374-49A7-808A-552B446A9CD4}
+	EndGlobalSection
+EndGlobal
