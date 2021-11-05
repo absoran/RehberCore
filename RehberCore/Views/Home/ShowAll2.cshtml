@@ -1,5 +1,4 @@
-﻿@*@model IEnumerable<RehberCore.Models.Contact>*@
-@model List<Contact>
+﻿@model List<Contact>
 @{
     ViewData["Title"] = "ShowAll2";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -40,11 +39,6 @@
                 {
                         @Html.DisplayName(number.PhoneNumber)<br />                       
                 }
-                    @*@for (int i = 0; i < item.Numbers.Count; i++)
-                    {
-                        @Html.DisplayFor(item => item[i].Numbers[i])<br />
-                    }*@
-                    @*@Html.DisplayFor(modelItem => item.Numbers)<text>|<br />|</text>*@
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

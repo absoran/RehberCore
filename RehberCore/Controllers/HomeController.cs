@@ -28,13 +28,6 @@ namespace RehberCore.Controllers
         {
             return View();
         }
-        //public IActionResult ShowAll()
-        //{
-        //    //Model = new IEnumerable<Number>;
-        //    Model = _dbcontext.Numbers.ToList();
-        //    return View(Model);
-        //}
-
         public IActionResult ShowAll2()
         {
             Models = _dbcontext.Contacts.ToList();
@@ -160,13 +153,9 @@ namespace RehberCore.Controllers
             _dbcontext.SaveChanges();
             return RedirectToAction("ShowAll2");
         }
-
-
         public IActionResult Details(int id)
         {
-            //var cont = _dbcontext.Contacts.Find(id);
-            //var temp = _dbcontext.Numbers.Find(id);
-            //int num = cont.Id;
+ 
             Modely = _dbcontext.Numbers.Where(x => x.ContactId == id).ToList();
 
             return View(Modely);
