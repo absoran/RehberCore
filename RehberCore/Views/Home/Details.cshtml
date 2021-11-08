@@ -4,24 +4,34 @@
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<h3>@Html.DisplayFor(model => model[0].Contact.FirstName) - @Html.DisplayFor(model => model[0].Contact.LastName)'s Details</h3>
+<p>
+    <a asp-action="AddNumber" asp-route-id="@Model[0].ContactId">Add New Number</a>
+</p>
+<table class="table" cellspacing="1">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Contact.Numbers)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td>
+                    <a asp-action="EditNumber" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="DeleteNumber" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-<h1>Details</h1>
-
-<div>
-    <h4>Number</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model[0].PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @for (int i = 0; i < Model.Count; i++)
-            {
-                @Html.DisplayFor(model => model[i].PhoneNumber)<br />
-            }
-        </dd>
-    </dl>
-</div>
 <div>    
-    <a asp-action="ShowAll2">Back to List</a>
+    <a asp-action="ListContacts">Back to List</a>
 </div>

@@ -14,6 +14,5 @@ namespace RehberCore.Models
         }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Number> Numbers { get; set; }
-        public DbSet<RehberCore.Models.ContactDTO> ContactDTO { get; set; }
     }
 }

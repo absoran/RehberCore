@@ -12,37 +12,38 @@ namespace RehberCore.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        public List<Number> Model { get; set; }
-        public List<Contact> Models { get; set; }
-        public IEnumerable<Contact> Modelx { get; set; }
-        public IEnumerable<Number> Modely { get; set; }
+        public List<Contact> ContactList { get; set; } //contact list for display all contacts
+        public IEnumerable<Number> NumberList { get; set; } //number list for display all contact numbers 
+        public static int ContactIdForNewNumber { get; set; } // global contact id variable for add new nubmer to existing contact
 
         private readonly RehberContext _dbcontext;
-        public HomeController(ILogger<HomeController> logger,RehberContext dbcontext)
+        public HomeController(ILogger<HomeController> logger,RehberContext dbcontext) //dbcontext instance added with dependency injection for database operations
         {
             _logger = logger;
             _dbcontext = dbcontext;
         }
 
-        public IActionResult Index()
+        
+        public IActionResult ListContacts()
         {
-            return View();
-        }
-        public IActionResult ShowAll2()
-        {
-            Models = _dbcontext.Contacts.ToList();
-            foreach (var item in Models)
+            ContactList = _dbcontext.Contacts.ToList();
+            foreach (var item in ContactList)
             {
                 item.Numbers = _dbcontext.Numbers.Where(x => x.ContactId == item.Id).ToList();
                 var x = item.Numbers[0];
                 Console.WriteLine(item.Numbers);
             }
-            return View(Models);
+            return View(ContactList);
         }
         public IActionResult Create()
         {
             return View();
         }
+        /// <summary>
+        /// User can add 3 number on creating new contact. If user need to add more number to contact; user can use add new number in details screen
+        /// </summary>
+        /// <param name="Model"> used data transfer object for add multiple number on create new contact. </param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Create(ContactDTO Model)
         {
@@ -52,113 +53,86 @@ namespace RehberCore.Controllers
             };
             _dbcontext.Contacts.Add(newcontact);
             _dbcontext.SaveChanges();
+
             var contacttoedit = _dbcontext.Contacts.FirstOrDefault(x => x.FirstName == Model.FirstName);
             if (contacttoedit == null)
             {
                 return NotFound();
             }
             _dbcontext.Entry(contacttoedit).State = EntityState.Detached;
-            var newnumber = new Number
+            if (Model.PhoneNumber != null)
             {
-                PhoneNumber = Model.PhoneNumber,
-                ContactId = contacttoedit.Id,
-            };
-            var newnumber2 = new Number
+                var newnumber = new Number
+                {
+                    PhoneNumber = Model.PhoneNumber,
+                    ContactId = contacttoedit.Id,
+                };
+                _dbcontext.Numbers.Add(newnumber);
+            }
+            if (Model.PhoneNumber2 != null)
             {
-                PhoneNumber = Model.PhoneNumber2,
-                ContactId = contacttoedit.Id,
-            };
-            var newnumber3 = new Number
+                var newnumber2 = new Number
+                {
+                    PhoneNumber = Model.PhoneNumber2,
+                    ContactId = contacttoedit.Id,
+                };
+                _dbcontext.Numbers.Add(newnumber2);
+            }
+            if (Model.PhoneNumber3 != null)
             {
-                PhoneNumber = Model.PhoneNumber3,
-                ContactId = contacttoedit.Id,
-            };
-            _dbcontext.Numbers.Add(newnumber);
-            _dbcontext.Numbers.Add(newnumber2);
-            _dbcontext.Numbers.Add(newnumber3);
-            var numberstoedit = _dbcontext.Numbers.Where(x => x.ContactId == contacttoedit.Id).ToList();
-            if (numberstoedit == null)
-            {
-                return NotFound();
+                var newnumber3 = new Number
+                {
+                    PhoneNumber = Model.PhoneNumber3,
+                    ContactId = contacttoedit.Id,
+                };
+                _dbcontext.Numbers.Add(newnumber3);
             }
             _dbcontext.SaveChanges();
-
-            return RedirectToAction("ShowAll2");
+            return RedirectToAction("ListContacts");
         }
+
+        public IActionResult AddNumber(int Id)
+        {
+            ContactIdForNewNumber = Id; // set global id variable for later use
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddNumber(Number Model)
+        {
+            Model.ContactId = ContactIdForNewNumber;
+            _dbcontext.Numbers.Add(Model);
+            _dbcontext.SaveChanges();
+            return RedirectToAction("ListContacts");
+        }
+
         public IActionResult Edit(int id)
         {
-            var contact = _dbcontext.Contacts.Include(p => p.Numbers).Where(e => e.Id == id).ToList();
-            var contactdto = new ContactDTO();
-            if(contact[0].Numbers.Count == 1)
-            {
-                contactdto = new ContactDTO
-                {
-                    FirstName = contact[0].FirstName,
-                    LastName = contact[0].LastName,
-                    ContactId = contact[0].Id,
-                    PhoneNumber = contact[0].Numbers[0].PhoneNumber
-                };
-            }
-            else if (contact[0].Numbers.Count == 2)
-            {
-                contactdto = new ContactDTO
-                {
-                    FirstName = contact[0].FirstName,
-                    LastName = contact[0].LastName,
-                    ContactId = contact[0].Id,
-                    PhoneNumber = contact[0].Numbers[0].PhoneNumber,
-                    PhoneNumber2 = contact[0].Numbers[1].PhoneNumber
-                };               
-            }
-            else if (contact[0].Numbers.Count == 3)
-            {
-                contactdto = new ContactDTO
-                {
-                    FirstName = contact[0].FirstName,
-                    LastName = contact[0].LastName,
-                    ContactId = contact[0].Id,
-                    PhoneNumber = contact[0].Numbers[0].PhoneNumber,
-                    PhoneNumber2 = contact[0].Numbers[1].PhoneNumber,
-                    PhoneNumber3 = contact[0].Numbers[2].PhoneNumber
-                };
-            }
-            return View(contactdto);
-        }
+            var contactToEdit = _dbcontext.Contacts.Include(e => e.Numbers).FirstOrDefault(x => x.Id == id);
+            return View(contactToEdit);
+        }   
+
         [HttpPost]
-        public IActionResult Edit(ContactDTO Model)
+        public IActionResult Edit(Contact Model)
         {
-            var existingcontact = _dbcontext.Contacts.Include(p => p.Numbers).FirstOrDefault(x => x.FirstName == Model.FirstName);
-            var existingnumber = _dbcontext.Numbers.Include(p => p.Contact).FirstOrDefault(x => x.ContactId == existingcontact.Id);
-            _dbcontext.Entry(existingcontact).State = EntityState.Detached;
-            _dbcontext.Entry(existingnumber).State = EntityState.Detached;
-            var newcontact = new Contact
+            var numberList = _dbcontext.Numbers.ToList().Where(x => x.ContactId == Model.Id);
+            int counter = 0;
+            foreach(var item in numberList)
             {
-                FirstName = Model.FirstName,
-                LastName = Model.LastName,
-                Numbers = existingcontact.Numbers,
-                Id = existingcontact.Id
-            };
-            var newnumber = new Number
-            {
-                Contact = newcontact,
-                Id = existingnumber.Id,
-                ContactId = newcontact.Id,
-                PhoneNumber = Model.PhoneNumber
-            };
-            newcontact.Numbers[0].PhoneNumber = Model.PhoneNumber;
-            if (Model.PhoneNumber2 != null) { newcontact.Numbers[1].PhoneNumber = Model.PhoneNumber2; }
-            if (Model.PhoneNumber3 != null) { newcontact.Numbers[2].PhoneNumber = Model.PhoneNumber2; }
-            _dbcontext.Entry(newcontact).State = EntityState.Modified;
-            _dbcontext.Entry(newnumber).State = EntityState.Modified;
+                var numberToEdit = _dbcontext.Numbers.Find(item.Id);
+                numberToEdit.PhoneNumber = Model.Numbers[counter].PhoneNumber;
+                _dbcontext.Entry(numberToEdit).State = EntityState.Modified;
+                counter++;
+            }
+            _dbcontext.Entry(Model).State = EntityState.Modified;
             _dbcontext.SaveChanges();
-            return RedirectToAction("ShowAll2");
+            return RedirectToAction("ListContacts");
         }
+
         public IActionResult Details(int id)
         {
- 
-            Modely = _dbcontext.Numbers.Where(x => x.ContactId == id).ToList();
-
-            return View(Modely);
+            NumberList = _dbcontext.Numbers.Where(x => x.ContactId == id).Include(x => x.Contact).ToList();
+            return View(NumberList);
         }
 
         public IActionResult Delete(int id)
@@ -174,18 +148,48 @@ namespace RehberCore.Controllers
                 }
                 _dbcontext.SaveChanges();
             }
-            return RedirectToAction("ShowAll2");
+            return RedirectToAction("ListContacts");
         }
-        public IActionResult Privacy()
+        public IActionResult DeleteNumber(int Id)
         {
-            
-            return View();
+            var numberToDelete = _dbcontext.Numbers.Find(Id);
+            _dbcontext.Numbers.Remove(numberToDelete);
+            _dbcontext.SaveChanges();
+            return RedirectToAction("ListContacts");
         }
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    }
+
+        
+        public IActionResult EditNumber(int Id)
+        {
+            var numberToEdit = _dbcontext.Numbers.Include(x => x.Contact).FirstOrDefault(e => e.Id == Id);
+            return View(numberToEdit);
+        }
+        [HttpPost]
+        public IActionResult EditNumber(Number number)
+        {
+            var numberToEdit = _dbcontext.Numbers.Find(number.Id);
+            numberToEdit.PhoneNumber = number.PhoneNumber;
+            _dbcontext.Entry(numberToEdit).State = EntityState.Modified;
+            _dbcontext.SaveChanges();
+            return RedirectToAction("ListContacts");
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+
+            return View();
+        }
+    }  
 }

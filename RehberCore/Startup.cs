@@ -54,7 +54,7 @@ namespace RehberCore
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=ShowAll2}/{id?}");
+                    pattern: "{controller=Home}/{action=ListContacts}/{id?}");
             });
         }
     }
